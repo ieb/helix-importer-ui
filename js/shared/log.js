@@ -16,7 +16,7 @@
       args[0] = `[importer-ui] ${args[0]}`;
     }
   };
-
+/*
   const _log = console.log;
   console.log = (...args) => {
     patchArgs(args);
@@ -34,4 +34,5 @@
     patchArgs(args);
     _error(...args);
   };
+  */
 }

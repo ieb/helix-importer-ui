@@ -35,24 +35,31 @@ export default class PollImporter {
       const mod = await import(projectTransformFileURL);
       if (mod.default) {
         $this.projectTransform = mod.default;
+      } else {
+        console.log("Transform failed to load ",projectTransformFileURL);
+
       }
     };
 
     const projectTransformFileURL = `${this.config.importFileURL}?cf=${new Date().getTime()}`;
     let body = '';
     try {
+      console.debug("Loading Transform file ",projectTransformFileURL);
       const res = await fetch(projectTransformFileURL);
       body = await res.text();
-
       if (res.ok && body !== this.lastProjectTransformFileBody) {
+        console.debug("Change or new transform file ",projectTransformFileURL);
         this.lastProjectTransformFileBody = body;
         await loadModule(projectTransformFileURL);
         this.projectTransformFileURL = projectTransformFileURL;
         // eslint-disable-next-line no-console
-        console.log(`Loaded importer file: ${projectTransformFileURL}`);
+        console.log(`Module loaded ok: ${projectTransformFileURL}`);
         return true;
+      } else {
+        console.debug("No change in transform file.",res.ok);
       }
     } catch (err) {
+      console.log("Module failed to load ",err);
       // ignore here, we know the file does not exist
     }
     if (body !== this.lastProjectTransformFileBody) {
@@ -90,6 +97,7 @@ export default class PollImporter {
           params,
         });
       } catch (err) {
+        console.err("Failed to load transformer json",err);
         this.errorListeners.forEach((listener) => {
           listener({
             url,
